@@ -63,8 +63,28 @@ const includesField = (text: string) => {
   return true
 }
 
-const concealDoubleColon = (node: Text) => {
-  node.textContent = (node.textContent || '').replace(/::/, ':')
+const concealDoubleColon = (node: Node) => {
+  const text = node.textContent || '';
+  const parts = text.split('::');
+  
+  if (parts.length > 1) {
+    const newNode = document.createElement('span');
+    newNode.classList.add('cm-reading-before-colon-conceal');
+    newNode.textContent = parts[0];
+    node.parentNode?.insertBefore(newNode, node);
+
+    const colonNode = document.createElement('span');
+    colonNode.classList.add('cm-reading-double-colon-conceal');
+    colonNode.textContent = ':';
+    node.parentNode?.insertBefore(colonNode, node);
+
+    const afterNode = document.createElement('span');
+    afterNode.classList.add('cm-reading-after-colon-conceal');
+    afterNode.textContent = parts.slice(1).join('');
+    node.parentNode?.insertBefore(afterNode, node);
+    
+    node.parentNode?.removeChild(node);
+  }
 }
 
 function hasOverlap(
